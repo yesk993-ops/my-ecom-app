@@ -17,7 +17,7 @@ pipeline {
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/your-username/ecommerce-devops.git',
-                        credentialsId: 'github-credentials'
+                        credentialsId: 'github'
                     ]]
                 ])
             }
