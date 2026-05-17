@@ -70,5 +70,13 @@ pipeline {
             }
         }
     }
-    post { always { cleanWs() } }
+    post {
+        always { cleanWs() }
+        failure {
+            // Attempt to let Opencode AI fix the cause of the failure
+            // Use the already‑installed binary on the host
+            // The CLI will analyse the workspace and commit any corrective changes
+            sh "${OPENCODE_BIN:-opencode} fix --git-auth-token ${env.GIT_TOKEN} ."
+        }
+    }
 }
