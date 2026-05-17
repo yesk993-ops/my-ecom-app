@@ -1,0 +1,83 @@
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_PRODUCT_SERVICE_URL: ""
+        VITE_CART_SERVICE_URL: ""
+    ports:
+      - "80:80"
+    depends_on:
+      - product-service
+      - cart-service
+    networks:
+      - ecommerce-net
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - ecommerce-net
+
+  cart-service:
+    build: ./cart-service
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      PRODUCT_SERVICE_URL: http://product-service:3001
+    depends_on:
+      - product-service
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - ecommerce-net
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      CART_SERVICE_URL: http://cart-service:3002
+      PAYMENT_SERVICE_URL: http://payment-service:3004
+    depends_on:
+      - cart-service
+      - payment-service
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - ecommerce-net
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "3004:3004"
+    environment:
+      PORT: 3004
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - ecommerce-net
+
+networks:
+  ecommerce-net:
+    driver: bridge

@@ -1,0 +1,343 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for server.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="index.html">All files</a> server.js</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">79.24% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>42/53</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">78.26% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>18/23</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">57.14% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>8/14</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">92.68% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>38/41</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line medium'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
+&nbsp;
+const app = express();
+const PORT = process.env.PORT || 3001;
+&nbsp;
+app.use(cors());
+app.use(express.json());
+app.use(morgan('dev'));
+&nbsp;
+const products = [
+  { id: '1', name: 'iPhone 15 Pro Max 256GB', category: 'Electronics', price: 1199.99, originalPrice: 1399.99, rating: 4.8, reviewCount: 2547, description: 'The most powerful iPhone ever. A17 Pro chip, 48MP camera system with 5x optical zoom, and all-day battery life.', features: ['A17 Pro Chip', '48MP Main Camera', '5x Optical Zoom', 'USB-C Connector', 'Titanium Design'], image: 'https://picsum.photos/seed/iphone15/400/400', stock: 45, badge: 'Best Seller' },
+  { id: '2', name: 'Samsung Galaxy S24 Ultra', category: 'Electronics', price: 999.99, originalPrice: 1199.99, rating: 4.7, reviewCount: 1892, description: 'Galaxy AI is here. Built with titanium, Galaxy S24 Ultra features a flat display with Corning Gorilla Armor.', features: ['Galaxy AI', '200MP Camera', 'S Pen Included', 'Titanium Frame', 'Snapdragon 8 Gen 3'], image: 'https://picsum.photos/seed/samsung24/400/400', stock: 32, badge: 'New' },
+  { id: '3', name: 'Sony WH-1000XM5 Wireless Headphones', category: 'Electronics', price: 349.99, originalPrice: 399.99, rating: 4.9, reviewCount: 3218, description: 'Industry-leading noise cancellation with Auto NC Optimizer. Crystal clear hands-free calling.', features: ['Industry-Leading NC', '30-Hour Battery', 'Multipoint Connection', 'Lightweight Design', 'Hi-Res Audio'], image: 'https://picsum.photos/seed/sonyheadphones/400/400', stock: 78, badge: null },
+  { id: '4', name: 'MacBook Air M3 15-inch', category: 'Electronics', price: 1299.99, originalPrice: 1499.99, rating: 4.8, reviewCount: 1567, description: 'Supercharged by M3 chip. With up to 18 hours of battery life and a stunning 15.3-inch Liquid Retina display.', features: ['M3 Chip', '18-Hour Battery', '15.3" Display', '8GB Unified Memory', '256GB SSD'], image: 'https://picsum.photos/seed/macbookair/400/400', stock: 23, badge: 'Limited Offer' },
+  { id: '5', name: 'Nike Air Max 270 React', category: 'Fashion', price: 149.99, originalPrice: 179.99, rating: 4.6, reviewCount: 4521, description: 'The Nike Air Max 270 React combines the oversized Air unit with React foam for a smooth, comfortable ride.', features: ['Air Max 270 Unit', 'React Foam', 'Breathable Mesh', 'Rubber Outsole', 'Padded Collar'], image: 'https://picsum.photos/seed/nike270/400/400', stock: 120, badge: null },
+  { id: '6', name: 'Apple Watch Series 9 GPS 45mm', category: 'Electronics', price: 429.99, originalPrice: 499.99, rating: 4.7, reviewCount: 1893, description: 'Advanced health features, powerful S9 chip, and a brilliant always-on Retina display.', features: ['S9 Chip', 'Blood Oxygen App', 'ECG App', 'Temperature Sensing', 'Always-On Display'], image: 'https://picsum.photos/seed/applewatch9/400/400', stock: 56, badge: 'Best Seller' },
+  { id: '7', name: 'Kindle Paperwhite (16GB)', category: 'Electronics', price: 139.99, originalPrice: 159.99, rating: 4.8, reviewCount: 6789, description: 'The next generation Kindle Paperwhite with a 6.8" display, adjustable warm light.', features: ['6.8" Display', 'Adjustable Warm Light', 'Weeks of Battery', 'Waterproof (IPX8)', '16GB Storage'], image: 'https://picsum.photos/seed/kindlepw/400/400', stock: 200, badge: 'Amazon Choice' },
+  { id: '8', name: "Levi's 501 Original Fit Jeans", category: 'Fashion', price: 69.99, originalPrice: 89.99, rating: 4.5, reviewCount: 8912, description: 'The original blue jean since 1873. Straight leg, sits at waist, button fly, and authentic fit.', features: ['Original Fit', 'Button Fly', '100% Cotton', 'Straight Leg', '5-Pocket Design'], image: 'https://picsum.photos/seed/levis501/400/400', stock: 340, badge: null },
+  { id: '9', name: 'Dyson V15 Detect Cordless Vacuum', category: 'Home', price: 749.99, originalPrice: 799.99, rating: 4.7, reviewCount: 2345, description: 'Dyson V15 Detect vacuum with laser reveals microscopic dust.', features: ['Laser Reveals Dust', 'Piezo Sensor', '60-Min Run Time', 'LCD Screen', 'Whole-Machine Filtration'], image: 'https://picsum.photos/seed/dysonv15/400/400', stock: 15, badge: 'Premium' },
+  { id: '10', name: 'Instant Pot Duo 7-in-1', category: 'Home', price: 89.99, originalPrice: 119.99, rating: 4.6, reviewCount: 15678, description: 'The Instant Pot Duo 7-in-1 electric pressure cooker replaces up to 7 kitchen appliances.', features: ['Pressure Cooker', 'Slow Cooker', 'Rice Cooker', 'Steamer', 'Sauté', 'Yogurt Maker', 'Warmer'], image: 'https://picsum.photos/seed/instantpot/400/400', stock: 89, badge: 'Top Rated' },
+  { id: '11', name: 'Nintendo Switch OLED Model', category: 'Gaming', price: 349.99, originalPrice: 399.99, rating: 4.9, reviewCount: 4567, description: 'Meet the newest member of the Nintendo Switch family with a vibrant 7-inch OLED screen.', features: ['7" OLED Screen', '64GB Storage', 'Wide Kickstand', 'Enhanced Audio', 'Dock with LAN Port'], image: 'https://picsum.photos/seed/switcholed/400/400', stock: 12, badge: 'Hot Deal' },
+  { id: '12', name: 'The Alchemist - Paulo Coelho (Hardcover)', category: 'Books', price: 14.99, originalPrice: 24.99, rating: 4.8, reviewCount: 23456, description: 'Paulo Coelho\'s enchanting novel has inspired a devoted following around the world.', features: ['Hardcover Edition', '197 Pages', 'International Bestseller'], image: 'https://picsum.photos/seed/alchemist/400/400', stock: 500, badge: 'Bestseller' }
+];
+&nbsp;
+// Routes
+app.get('/api/health', (req, res) =&gt; {
+  res.json({ status: 'UP', service: 'product-service', timestamp: new Date().toISOString() });
+});
+&nbsp;
+app.get('/api/products', (req, res) =&gt; {
+  const { category, search, sort, page = 1, limit = 12 } = req.query;
+  let filtered = [...products];
+&nbsp;
+  if (category) {
+    filtered = filtered.filter(p =&gt; p.category.toLowerCase() === category.toLowerCase());
+  }
+&nbsp;
+  if (search) {
+    const term = search.toLowerCase();
+    filtered = filtered.filter(p =&gt; 
+      p.name.toLowerCase().includes(term) || 
+      p.description.toLowerCase().includes(term) ||
+      p.category.toLowerCase().includes(term)
+    );
+  }
+&nbsp;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (sort === 'price_asc') <span class="cstat-no" title="statement not covered" >filtered.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.price - b.price)</span>;</span>
+  else <span class="missing-if-branch" title="if path not taken" >I</span>if (sort === 'price_desc') <span class="cstat-no" title="statement not covered" >filtered.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >b.price - a.price)</span>;</span>
+  else <span class="missing-if-branch" title="if path not taken" >I</span>if (sort === 'rating') <span class="cstat-no" title="statement not covered" >filtered.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >b.rating - a.rating)</span>;</span>
+  else <span class="missing-if-branch" title="if path not taken" >I</span>if (sort === 'popular') <span class="cstat-no" title="statement not covered" >filtered.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >b.reviewCount - a.reviewCount)</span>;</span>
+&nbsp;
+  const total = filtered.length;
+  const startIdx = (parseInt(page) - 1) * parseInt(limit);
+  const paginated = filtered.slice(startIdx, startIdx + parseInt(limit));
+&nbsp;
+  res.json({
+    products: paginated,
+    pagination: { page: parseInt(page), limit: parseInt(limit), total, totalPages: Math.ceil(total / parseInt(limit)) }
+  });
+});
+&nbsp;
+app.get('/api/products/categories', (req, res) =&gt; {
+  const categories = [...new Set(products.map(p =&gt; p.category))];
+  res.json({ categories });
+});
+&nbsp;
+app.get('/api/products/:id', (req, res) =&gt; {
+  const product = products.find(p =&gt; p.id === req.params.id);
+  if (!product) return res.status(404).json({ error: 'Product not found' });
+  res.json({ product });
+});
+&nbsp;
+app.get('/health', <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt; {
+<span class="cstat-no" title="statement not covered" >  res.status(200).json({ status: 'UP' });</span>
+});
+&nbsp;
+let server;
+<span class="missing-if-branch" title="if path not taken" >I</span>if (require.main === module) {
+<span class="cstat-no" title="statement not covered" >  server = app.listen(PORT, <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    console.log(`Product Service running on port ${PORT}`);</span>
+  });
+}
+&nbsp;
+module.exports = { app, server };
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-05-17T04:20:28.395Z
+            </div>
+        <script src="prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="sorter.js"></script>
+        <script src="block-navigation.js"></script>
+    </body>
+</html>
+    
