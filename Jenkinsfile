@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_REGISTRY = 'mydocker3692'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-        SONAR_HOST_URL = 'http://sonarqube:9000'
+        SONAR_HOST_URL = 'http://192.168.122.151:9000'
         SONAR_TOKEN = credentials('sonar-token')
     }
 
