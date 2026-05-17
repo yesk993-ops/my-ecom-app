@@ -7,8 +7,8 @@ pipeline {
         SONAR_HOST_URL = 'http://192.168.122.151:9000'
         SONAR_TOKEN = credentials('sonar-token')
         GIT_TOKEN = credentials('git-token')
-        // Opencode is pre-installed on the Jenkins host at /home/test/.opencode/bin/opencode
-        OPENCODE_BIN = '/home/test/.opencode/bin/opencode'
+        // Opencode is installed at /usr/local/bin/opencode (accessible to Jenkins user)
+        OPENCODE_BIN = 'opencode'
         // Repository URL (the correct, existing repo)
         REPO_URL = 'https://github.com/yesk993-ops/my-ecom-app.git'
     }
@@ -21,8 +21,8 @@ pipeline {
                     opencodeFix = { String target = '.' ->
                         def bin = env.OPENCODE_BIN ?: 'opencode'
                         // Check if binary exists before attempting to run it
-                        def binExists = sh(script: "which ${bin} 2>/dev/null || command -v ${bin} 2>/dev/null", returnStdout: true).trim()
-                        if (binExists) {
+                        def status = sh(script: "command -v ${bin} >/dev/null 2>&1 && [ -x \"\$(command -v ${bin})\" ]", returnStatus: true)
+                        if (status == 0) {
                             sh "${bin} fix --git-auth-token ${env.GIT_TOKEN} ${target}"
                         } else {
                             echo "WARNING: '${bin}' not found — skipping Opencode fix for ${target}. Set OPENCODE_BIN env var if installed elsewhere."
@@ -107,8 +107,8 @@ pipeline {
         failure {
             script {
                 def bin = env.OPENCODE_BIN ?: 'opencode'
-                def binExists = sh(script: "which ${bin} 2>/dev/null || command -v ${bin} 2>/dev/null", returnStdout: true).trim()
-                if (binExists) {
+                def status = sh(script: "command -v ${bin} >/dev/null 2>&1 && [ -x \"\$(command -v ${bin})\" ]", returnStatus: true)
+                if (status == 0) {
                     sh "${bin} fix --git-auth-token ${env.GIT_TOKEN} ."
                 } else {
                     echo "WARNING: '${bin}' not found — cannot run Opencode auto-fix. Set OPENCODE_BIN env var if installed elsewhere."
