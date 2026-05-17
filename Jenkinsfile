@@ -9,6 +9,8 @@ pipeline {
         GIT_TOKEN = credentials('git-token')
         // If opencode binary is not on PATH, set absolute path here
         // OPENCODE_BIN = '/usr/local/bin/opencode'
+        // Repository URL (the correct, existing repo)
+        REPO_URL = 'https://github.com/yesk993-ops/my-ecom-app.git'
     }
 
     stages {
@@ -18,7 +20,13 @@ pipeline {
                     // Define the Opencode fix helper closure for use in later stages
                     opencodeFix = { String target = '.' ->
                         def bin = env.OPENCODE_BIN ?: 'opencode'
-                        sh "${bin} fix --git-auth-token ${env.GIT_TOKEN} ${target}"
+                        // Check if binary exists before attempting to run it
+                        def binExists = sh(script: "which ${bin} 2>/dev/null || command -v ${bin} 2>/dev/null", returnStdout: true).trim()
+                        if (binExists) {
+                            sh "${bin} fix --git-auth-token ${env.GIT_TOKEN} ${target}"
+                        } else {
+                            echo "WARNING: '${bin}' not found — skipping Opencode fix for ${target}. Set OPENCODE_BIN env var if installed elsewhere."
+                        }
                     }
                 }
             }
@@ -29,7 +37,7 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/yesk993-ops/ecom-app.git',
+                        url: env.REPO_URL,
                         credentialsId: 'github'
                     ]]
                 ])
@@ -98,7 +106,12 @@ pipeline {
         failure {
             script {
                 def bin = env.OPENCODE_BIN ?: 'opencode'
-                sh "${bin} fix --git-auth-token ${env.GIT_TOKEN} ."
+                def binExists = sh(script: "which ${bin} 2>/dev/null || command -v ${bin} 2>/dev/null", returnStdout: true).trim()
+                if (binExists) {
+                    sh "${bin} fix --git-auth-token ${env.GIT_TOKEN} ."
+                } else {
+                    echo "WARNING: '${bin}' not found — cannot run Opencode auto-fix. Set OPENCODE_BIN env var if installed elsewhere."
+                }
             }
         }
     }
