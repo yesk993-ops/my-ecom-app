@@ -26,11 +26,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        docker run --rm \
-                            -v "$PWD:/usr/src" \
-                            -e SONAR_HOST_URL \
-                            -e SONAR_TOKEN \
-                            sonarsource/sonar-scanner-cli \
+                        sonar-scanner \
                             -Dsonar.projectKey=ecommerce-devops \
                             -Dsonar.sources=.
                     '''
