@@ -25,7 +25,15 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh "sonar-scanner -Dsonar.projectKey=ecommerce-devops -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN"
+                    sh '''
+                        docker run --rm \
+                            -v "$PWD:/usr/src" \
+                            -e SONAR_HOST_URL \
+                            -e SONAR_TOKEN \
+                            sonarsource/sonar-scanner-cli \
+                            -Dsonar.projectKey=ecommerce-devops \
+                            -Dsonar.sources=.
+                    '''
                 }
             }
         }
