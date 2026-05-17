@@ -16,8 +16,8 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/your-username/ecommerce-devops.git',
-                        credentialsId: 'github'
+                        url: 'https://github.com/yesk993-ops/ecom-app.git',
+                        credentialsId: 'github-credentials'
                     ]]
                 ])
             }
