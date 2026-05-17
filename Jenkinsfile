@@ -7,8 +7,8 @@ pipeline {
         SONAR_HOST_URL = 'http://192.168.122.151:9000'
         SONAR_TOKEN = credentials('sonar-token')
         GIT_TOKEN = credentials('git-token')
-        // If opencode binary is not on PATH, set absolute path here
-        // OPENCODE_BIN = '/usr/local/bin/opencode'
+        // Opencode is pre-installed on the Jenkins host at /home/test/.opencode/bin/opencode
+        OPENCODE_BIN = '/home/test/.opencode/bin/opencode'
         // Repository URL (the correct, existing repo)
         REPO_URL = 'https://github.com/yesk993-ops/my-ecom-app.git'
     }
@@ -33,6 +33,7 @@ pipeline {
         }
         stage('Checkout') {
             steps {
+                // Use Git credentials securely
                 checkout([
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
