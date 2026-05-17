@@ -17,7 +17,7 @@ pipeline {
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/yesk993-ops/ecom-app.git',
-                        credentialsId: 'github-credentials'
+                        credentialsId: 'github'
                     ]]
                 ])
             }
