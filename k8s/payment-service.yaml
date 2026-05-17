@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
       - name: payment-service
-        image: ecommerce/payment-service:latest
-        imagePullPolicy: IfNotPresent
+        image: mydocker3692/payment-service:${env.BUILD_NUMBER}
+        imagePullPolicy: Always
         ports:
         - containerPort: 3004
         env:

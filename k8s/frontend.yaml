@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ecommerce/frontend:latest
-        imagePullPolicy: IfNotPresent
+        image: mydocker3692/frontend:${env.BUILD_NUMBER}
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         env:

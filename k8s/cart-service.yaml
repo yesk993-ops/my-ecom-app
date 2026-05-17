@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
       - name: cart-service
-        image: ecommerce/cart-service:latest
-        imagePullPolicy: IfNotPresent
+        image: mydocker3692/cart-service:${env.BUILD_NUMBER}
+        imagePullPolicy: Always
         ports:
         - containerPort: 3002
         env:
