@@ -73,16 +73,28 @@ pipeline {
             steps { timeout(time: 5, unit: 'MINUTES') { waitForQualityGate abortPipeline: true } }
             post { failure { script { opencodeFix() } } }
         }
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
         stage('Build & Push Docker Images') {
             steps {
                 script {
-                    def services = ['cart-service', 'frontend', 'order-service', 'payment-service', 'product-service']
-                    services.each { svc ->
-                        dir(svc) {
-                            // Fix before building this service
+                    def serviceMap = [
+                        'cart-service': 'cart',
+                        'frontend': 'frontend',
+                        'order-service': 'order',
+                        'payment-service': 'payment',
+                        'product-service': 'product'
+                    ]
+                    serviceMap.each { dirName, imageName ->
+                        dir(dirName) {
                             opencodeFix('.')
-                            sh "docker build -t $DOCKER_REGISTRY/${svc}:$IMAGE_TAG ."
-                            sh "docker push $DOCKER_REGISTRY/${svc}:$IMAGE_TAG"
+                            sh "docker build -t ${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG} ."
+                            sh "docker push ${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG}"
                         }
                     }
                 }
@@ -92,10 +104,15 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 script {
-                    def services = ['cart-service', 'frontend', 'order-service', 'payment-service', 'product-service']
-                    services.each { svc ->
-                        // Allow scan to continue; Opencode can attempt fix on failure
-                        sh "trivy image --exit-code 1 --severity HIGH,CRITICAL $DOCKER_REGISTRY/${svc}:$IMAGE_TAG || true"
+                    def serviceMap = [
+                        'cart-service': 'cart',
+                        'frontend': 'frontend',
+                        'order-service': 'order',
+                        'payment-service': 'payment',
+                        'product-service': 'product'
+                    ]
+                    serviceMap.each { dirName, imageName ->
+                        sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG} || true"
                     }
                 }
             }
