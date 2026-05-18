@@ -92,9 +92,18 @@ pipeline {
                     ]
                     serviceMap.each { dirName, imageName ->
                         dir(dirName) {
-                            opencodeFix('.')
-                            sh "docker build -t ${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG} ."
-                            sh "docker push ${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG}"
+                            def fullImage = "${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG}"
+                            def imageExists = sh(
+                                script: "docker manifest inspect ${fullImage} >/dev/null 2>&1",
+                                returnStatus: true
+                            ) == 0
+                            if (imageExists) {
+                                echo "Image ${fullImage} already exists on Docker Hub — skipping build and push"
+                            } else {
+                                opencodeFix('.')
+                                sh "docker build -t ${fullImage} ."
+                                sh "docker push ${fullImage}"
+                            }
                         }
                     }
                 }
