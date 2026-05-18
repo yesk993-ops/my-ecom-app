@@ -102,22 +102,26 @@ pipeline {
                         'payment-service': 'payment',
                         'product-service': 'product'
                     ]
+                    def parallelBuilds = [:]
                     serviceMap.each { dirName, imageName ->
-                        dir(dirName) {
-                            def fullImage = "${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG}"
-                            def imageExists = sh(
-                                script: "docker manifest inspect ${fullImage} >/dev/null 2>&1",
-                                returnStatus: true
-                            ) == 0
-                            if (imageExists) {
-                                echo "Image ${fullImage} already exists on Docker Hub — skipping build and push"
-                            } else {
-                                opencodeFix('.')
-                                sh "docker build -t ${fullImage} ."
-                                sh "docker push ${fullImage}"
+                        def fullImage = "${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG}"
+                        parallelBuilds[dirName] = {
+                            dir(dirName) {
+                                def imageExists = sh(
+                                    script: "docker manifest inspect ${fullImage} >/dev/null 2>&1",
+                                    returnStatus: true
+                                ) == 0
+                                if (imageExists) {
+                                    echo "Image ${fullImage} already exists on Docker Hub — skipping build and push"
+                                } else {
+                                    opencodeFix('.')
+                                    sh "docker build -t ${fullImage} ."
+                                    sh "docker push ${fullImage}"
+                                }
                             }
                         }
                     }
+                    parallel parallelBuilds
                 }
             }
             post { failure { script { opencodeFix() } } }
@@ -132,23 +136,37 @@ pipeline {
                         'payment-service': 'payment',
                         'product-service': 'product'
                     ]
+                    def parallelScans = [:]
                     serviceMap.each { dirName, imageName ->
-                        sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG} || true"
+                        def fullImage = "${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG}"
+                        parallelScans[dirName] = {
+                            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL ${fullImage} || true"
+                        }
                     }
+                    parallel parallelScans
                 }
             }
             post { failure { script { opencodeFix() } } }
         }
         stage('Deploy to Kubernetes') {
             steps {
-                // Fix any manifest issues before applying
-                script { opencodeFix('k8s') }
-                sh "kubectl apply -f k8s/namespace.yaml"
-                sh "kubectl apply -f k8s/cart-service.yaml"
-                sh "kubectl apply -f k8s/frontend.yaml"
-                sh "kubectl apply -f k8s/order-service.yaml"
-                sh "kubectl apply -f k8s/payment-service.yaml"
-                sh "kubectl apply -f k8s/product-service.yaml"
+                script {
+                    opencodeFix('k8s')
+                    sh "sed -i 's|__TAG__|v${IMAGE_TAG}|g' k8s/*.yaml"
+                    sh "kubectl apply -f k8s/namespace.yaml"
+                    sh "kubectl apply -f k8s/cart-service.yaml"
+                    sh "kubectl apply -f k8s/frontend.yaml"
+                    sh "kubectl apply -f k8s/order-service.yaml"
+                    sh "kubectl apply -f k8s/payment-service.yaml"
+                    sh "kubectl apply -f k8s/product-service.yaml"
+                    sh "sleep 10 && kubectl get pods -n ecommerce"
+                    sh "kubectl rollout status deployment/frontend -n ecommerce --timeout=120s || true"
+                    sh "kubectl rollout status deployment/cart-service -n ecommerce --timeout=120s || true"
+                    sh "kubectl rollout status deployment/order-service -n ecommerce --timeout=120s || true"
+                    sh "kubectl rollout status deployment/payment-service -n ecommerce --timeout=120s || true"
+                    sh "kubectl rollout status deployment/product-service -n ecommerce --timeout=120s || true"
+                    sh "echo '=== Pod Status ===' && kubectl get pods -n ecommerce && echo '=== Services ===' && kubectl get svc -n ecommerce"
+                }
             }
             post { failure { script { opencodeFix('k8s') } } }
         }
