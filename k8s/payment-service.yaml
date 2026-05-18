@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: payment-service
-        image: mydocker3692/ecommerce:payment-__TAG__
+        image: __ECR_REPO__:payment-__TAG__
         imagePullPolicy: Always
         ports:
         - containerPort: 3004

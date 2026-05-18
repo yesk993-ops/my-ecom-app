@@ -2,7 +2,10 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = 'mydocker3692'
+        AWS_ACCOUNT_ID = credentials('aws-account-id')
+        AWS_REGION = 'us-east-1'
+        EKS_CLUSTER_NAME = 'ecommerce-eks'
+        ECR_REPO = 'ecommerce'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         SONAR_HOST_URL = 'http://192.168.122.151:9000'
         SONAR_TOKEN = credentials('sonar-token')
@@ -81,7 +84,7 @@ pipeline {
                     try {
                         withSonarQubeEnv('SonarQube') {
                             def scannerHome = tool 'sonar-scanner'
-                            sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ecommerce-devops -Dsonar.sources=."
+                            sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ecommerce-aws -Dsonar.sources=."
                         }
                     } catch (Exception e) {
                         opencodeFix('SonarQube Analysis', '.', e.getMessage())
@@ -102,20 +105,20 @@ pipeline {
                 }
             }
         }
-        stage('Docker Login') {
+        stage('AWS Login & ECR Auth') {
             steps {
                 script {
                     try {
-                        withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                            sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                            sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
                         }
                     } catch (Exception e) {
-                        opencodeFix('Docker Login', '.', e.getMessage())
+                        opencodeFix('AWS Login & ECR Auth', '.', e.getMessage())
                     }
                 }
             }
         }
-        stage('Build & Push Docker Images') {
+        stage('Build & Push to ECR') {
             steps {
                 script {
                     def serviceMap = [
@@ -127,20 +130,20 @@ pipeline {
                     ]
                     def parallelBuilds = [:]
                     serviceMap.each { dirName, imageName ->
-                        def fullImage = "${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG}"
+                        def ecrImage = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${imageName}-v${IMAGE_TAG}"
                         parallelBuilds[dirName] = {
                             dir(dirName) {
                                 def imageExists = sh(
-                                    script: "docker manifest inspect ${fullImage} >/dev/null 2>&1",
+                                    script: "aws ecr describe-images --repository-name ${ECR_REPO} --image-ids imageTag=${imageName}-v${IMAGE_TAG} --region ${AWS_REGION} >/dev/null 2>&1",
                                     returnStatus: true
                                 ) == 0
                                 if (imageExists) {
-                                    echo "Image ${fullImage} already exists on Docker Hub — skipping build and push"
+                                    echo "ECR image ${ecrImage} already exists — skipping build and push"
                                 } else {
                                     try {
                                         opencodeFix("Build ${dirName}", '.', 'Pre-build check and fix')
-                                        sh "docker build -t ${fullImage} ."
-                                        sh "docker push ${fullImage}"
+                                        sh "docker build -t ${ecrImage} ."
+                                        sh "docker push ${ecrImage}"
                                     } catch (Exception e) {
                                         opencodeFix("Build ${dirName}", '.', e.getMessage())
                                     }
@@ -164,38 +167,58 @@ pipeline {
                     ]
                     def parallelScans = [:]
                     serviceMap.each { dirName, imageName ->
-                        def fullImage = "${DOCKER_REGISTRY}/ecommerce:${imageName}-v${IMAGE_TAG}"
+                        def ecrImage = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${imageName}-v${IMAGE_TAG}"
                         parallelScans[dirName] = {
-                            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL ${fullImage} || true"
+                            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                                sh "docker run --rm -e AWS_ACCESS_KEY_ID=\${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=\${AWS_SECRET_ACCESS_KEY} -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL ${ecrImage} || true"
+                            }
                         }
                     }
                     parallel parallelScans
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Configure EKS') {
             steps {
                 script {
                     try {
-                        opencodeFix('Deploy to Kubernetes', 'k8s', 'Pre-deployment manifest check')
-                        sh "sed -i 's|__TAG__|v${IMAGE_TAG}|g' k8s/*.yaml"
-                    sh "sed -i 's|__ECR_REPO__|${DOCKER_REGISTRY}/ecommerce|g' k8s/*.yaml"
-                        sh "kubectl apply -f k8s/namespace.yaml"
-                        sh "kubectl apply -f k8s/cart-service.yaml"
-                        sh "kubectl apply -f k8s/frontend.yaml"
-                        sh "kubectl apply -f k8s/order-service.yaml"
-                        sh "kubectl apply -f k8s/payment-service.yaml"
-                        sh "kubectl apply -f k8s/product-service.yaml"
-                        sh "git checkout k8s/*.yaml"
-                        sh "sleep 10 && kubectl get pods -n ecommerce"
-                        sh "kubectl rollout status deployment/frontend -n ecommerce --timeout=120s || true"
-                        sh "kubectl rollout status deployment/cart-service -n ecommerce --timeout=120s || true"
-                        sh "kubectl rollout status deployment/order-service -n ecommerce --timeout=120s || true"
-                        sh "kubectl rollout status deployment/payment-service -n ecommerce --timeout=120s || true"
-                        sh "kubectl rollout status deployment/product-service -n ecommerce --timeout=120s || true"
-                        sh "echo '=== Pod Status ===' && kubectl get pods -n ecommerce && echo '=== Services ===' && kubectl get svc -n ecommerce"
+                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                            sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}"
+                            sh "kubectl get nodes"
+                        }
                     } catch (Exception e) {
-                        opencodeFix('Deploy to Kubernetes', 'k8s', e.getMessage())
+                        opencodeFix('Configure EKS', '.', e.getMessage())
+                    }
+                }
+            }
+        }
+        stage('Deploy to EKS') {
+            steps {
+                script {
+                    try {
+                        opencodeFix('Deploy to EKS', 'k8s', 'Pre-deployment manifest check')
+                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                            sh """
+                            sed -i 's|__TAG__|v${IMAGE_TAG}|g' k8s/*.yaml
+                            sed -i 's|__ECR_REPO__|${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}|g' k8s/*.yaml
+                            """
+                            sh "kubectl apply -f k8s/namespace.yaml"
+                            sh "kubectl apply -f k8s/cart-service.yaml"
+                            sh "kubectl apply -f k8s/frontend.yaml"
+                            sh "kubectl apply -f k8s/order-service.yaml"
+                            sh "kubectl apply -f k8s/payment-service.yaml"
+                            sh "kubectl apply -f k8s/product-service.yaml"
+                            sh "git checkout k8s/*.yaml"
+                            sh "sleep 15 && kubectl get pods -n ecommerce"
+                            sh "kubectl rollout status deployment/frontend -n ecommerce --timeout=180s || true"
+                            sh "kubectl rollout status deployment/cart-service -n ecommerce --timeout=180s || true"
+                            sh "kubectl rollout status deployment/order-service -n ecommerce --timeout=180s || true"
+                            sh "kubectl rollout status deployment/payment-service -n ecommerce --timeout=180s || true"
+                            sh "kubectl rollout status deployment/product-service -n ecommerce --timeout=180s || true"
+                            sh "echo '=== Pod Status ===' && kubectl get pods -n ecommerce && echo '=== Services ===' && kubectl get svc -n ecommerce"
+                        }
+                    } catch (Exception e) {
+                        opencodeFix('Deploy to EKS', 'k8s', e.getMessage())
                     }
                 }
             }
