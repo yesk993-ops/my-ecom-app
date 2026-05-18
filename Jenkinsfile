@@ -18,12 +18,14 @@ pipeline {
             steps {
                 script {
                     // Define the Opencode fix helper closure for use in later stages
-                    opencodeFix = { String target = '.' ->
+                    opencodeFix = { String target = '.', String prompt = 'Analyze and fix any build or configuration issues in this directory' ->
                         def bin = env.OPENCODE_BIN ?: 'opencode'
                         // Check if binary exists before attempting to run it
                         def status = sh(script: "command -v ${bin} >/dev/null 2>&1 && [ -x \"\$(command -v ${bin})\" ]", returnStatus: true)
                         if (status == 0) {
-                            sh "${bin} fix --git-auth-token ${env.GIT_TOKEN} ${target}"
+                            withCredentials([string(credentialsId: 'git-token', variable: 'GHTOKEN')]) {
+                                sh "GITHUB_TOKEN=\${GHTOKEN} ${bin} run --prompt '${prompt}' ${target}"
+                            }
                         } else {
                             echo "WARNING: '${bin}' not found — skipping Opencode fix for ${target}. Set OPENCODE_BIN env var if installed elsewhere."
                         }
@@ -109,7 +111,9 @@ pipeline {
                 def bin = env.OPENCODE_BIN ?: 'opencode'
                 def status = sh(script: "command -v ${bin} >/dev/null 2>&1 && [ -x \"\$(command -v ${bin})\" ]", returnStatus: true)
                 if (status == 0) {
-                    sh "${bin} fix --git-auth-token ${env.GIT_TOKEN} ."
+                    withCredentials([string(credentialsId: 'git-token', variable: 'GHTOKEN')]) {
+                        sh "GITHUB_TOKEN=\${GHTOKEN} ${bin} run --prompt 'Analyze and fix any pipeline failures' ."
+                    }
                 } else {
                     echo "WARNING: '${bin}' not found — cannot run Opencode auto-fix. Set OPENCODE_BIN env var if installed elsewhere."
                 }
