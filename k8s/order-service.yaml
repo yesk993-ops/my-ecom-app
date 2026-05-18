@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: order-service
-        image: mydocker3692/order-service:${env.BUILD_NUMBER}
+        image: mydocker3692/ecommerce:order-v${BUILD_NUMBER}
         imagePullPolicy: Always
         ports:
         - containerPort: 3003

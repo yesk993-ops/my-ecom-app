@@ -9,6 +9,7 @@ pipeline {
         GIT_TOKEN = credentials('git-token')
         // Opencode is installed at /usr/local/bin/opencode (accessible to Jenkins user)
         OPENCODE_BIN = 'opencode'
+        OPENCODE_MODEL = 'opencode/qwen3.6-plus-free'
         // Repository URL (the correct, existing repo)
         REPO_URL = 'https://github.com/yesk993-ops/my-ecom-app.git'
     }
@@ -32,6 +33,7 @@ pipeline {
                                 export GITHUB_TOKEN=${GHTOKEN}
                                 ${bin} run \\
                                 "${prompt}" \\
+                                -m ${env.OPENCODE_MODEL} \\
                                 --dir ${target} \\
                                 --print-logs \\
                                 --dangerously-skip-permissions
@@ -42,6 +44,16 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+        stage('Opencode Version Check') {
+            steps {
+                sh '''
+                echo "=== Opencode Proof ==="
+                opencode --version
+                opencode models | grep free
+                echo "=== Opencode is working ==="
+                '''
             }
         }
         stage('Checkout') {
@@ -155,6 +167,7 @@ pipeline {
                         export GITHUB_TOKEN=${GHTOKEN}
                         ${bin} run \\
                         "Analyze and fix pipeline failures" \\
+                        -m ${env.OPENCODE_MODEL} \\
                         --dir . \\
                         --print-logs \\
                         --dangerously-skip-permissions

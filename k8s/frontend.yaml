@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: mydocker3692/frontend:${env.BUILD_NUMBER}
+        image: mydocker3692/ecommerce:frontend-v${BUILD_NUMBER}
         imagePullPolicy: Always
         ports:
         - containerPort: 80
