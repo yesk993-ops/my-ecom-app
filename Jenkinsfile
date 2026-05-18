@@ -159,6 +159,7 @@ pipeline {
                     sh "kubectl apply -f k8s/order-service.yaml"
                     sh "kubectl apply -f k8s/payment-service.yaml"
                     sh "kubectl apply -f k8s/product-service.yaml"
+                    sh "git checkout k8s/*.yaml"
                     sh "sleep 10 && kubectl get pods -n ecommerce"
                     sh "kubectl rollout status deployment/frontend -n ecommerce --timeout=120s || true"
                     sh "kubectl rollout status deployment/cart-service -n ecommerce --timeout=120s || true"
